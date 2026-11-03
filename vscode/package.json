@@ -1,0 +1,24 @@
+{
+  "name": "loom-editor",
+  "displayName": "Loom Editor",
+  "description": "Editing loom's source files: errors where you type, from the loom language server",
+  "version": "0.1.0",
+  "private": true,
+  "engines": { "vscode": "^1.91.0" },
+  "activationEvents": [
+    "workspaceContains:**/*display.txt"
+  ],
+  "main": "./out/extension.js",
+  "scripts": {
+    "compile": "tsc -p .",
+    "watch": "tsc -watch -p ."
+  },
+  "dependencies": {
+    "vscode-languageclient": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/vscode": "~1.91.0",
+    "typescript": "^7.0.2"
+  }
+}
