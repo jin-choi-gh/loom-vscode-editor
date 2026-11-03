@@ -40,7 +40,10 @@ milestones in the README say what comes next; this file holds what was set aside
 - [ ] **One Prettier version.** anthos-reader pins Prettier 3.9.10 and has `format` scripts; this
       repository has neither, and checks with another version format a line of `toPoem.ts`
       differently. Add `prettier@3.9.10` to `vscode/package.json`'s dev dependencies, with
-      `format` and `format:check` scripts.
+      `format` and `format:check` scripts. Also move `vscode/.prettierrc.json` to the
+      repository's root: Prettier finds its settings only above the file it formats, so today
+      the scripts, the README and this file get Prettier's own defaults (semicolons crept into
+      `scripts/find_python.mjs` this way) unless the settings file is named explicitly.
 - [ ] **Watching both sides.** `npm run compile` is run by F5 before each launch, so no watch is
       needed. A watch would need two processes at once (`tsc --watch` for the extension, esbuild's
       `--watch` for the page).
@@ -55,6 +58,21 @@ milestones in the README say what comes next; this file holds what was set aside
       to report problems with their file, row and column (loom/EXTENSIONS.md).
 - [ ] **A `loom.synthesis` setting**, machine-scoped, to use a loom checkout instead of the
       submodule or the bundled copy, for trying uncommitted loom changes.
+
+## Finding Python
+
+- [ ] **The Python extension's interpreter.** When Microsoft's Python extension is installed, the
+      user has often chosen an interpreter in it; its API (`@vscode/python-extension`) could
+      offer that one before the search. Set aside: it would make that extension a dependency, and
+      the search plus `loom.python` covers every machine without it. _Where:_ `src/python.ts`.
+- [ ] **Newer Pythons by name.** The search asks for `python3.14`, `python3.13` and `python3.12`
+      by name on macOS and Linux, then for `python3`. A Python 3.15 installed beside an older
+      `python3` would be missed until its name is added. _Where:_ `candidates()` in
+      `src/python.ts`.
+- [ ] **Tested on macOS and Linux.** The search has run for real only on Windows; the macOS and
+      Linux lists were checked with a simulated `PATH`. The first real checks: a colleague's Mac
+      (`node scripts/find_python.mjs`), and later the cross-system GitHub Actions run (P7), once
+      the repositories are private.
 
 ## Packaging and safety
 

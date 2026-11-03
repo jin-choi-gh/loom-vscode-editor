@@ -10,7 +10,7 @@
         "${workspaceFolder}/examples"
       ],
       "outFiles": ["${workspaceFolder}/vscode/out/**/*.js"],
-      "preLaunchTask": "compile the extension"
+      "preLaunchTask": "build"
     }
   ]
 }

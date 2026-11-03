@@ -45,11 +45,11 @@ export function PoemBlock({
               data-line-id={line.id}
               // style={{ '--indent': line.indent ?? 0 } as CSSProperties }
             >
-              {line.number % 5 === 0 && (
-                <span className="line-number" aria-hidden="true">
-                  {line.number}
-                </span>
-              )}
+              {/* {line.number % 5 === 0 && ( */}
+              <span className="line-number" aria-hidden="true">
+                l{line.number}
+              </span>
+              {/* )} */}
               <span className="line-text">
                 {cut(line.text, selectedRanges(line)).map((piece, j) =>
                   piece.ranges.length > 0 ? (

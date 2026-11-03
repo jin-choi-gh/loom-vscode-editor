@@ -2,14 +2,22 @@
 
 .venv/Scripts/python scripts/talk.py      (Windows)
 .venv/bin/python scripts/talk.py          (macOS / Linux)
+
+It talks to the bundled server, started as the extension starts it: run scripts/bundle.py
+first.
 """
 
 import json
 import subprocess
 import sys
+from pathlib import Path
+
+START = Path(__file__).resolve().parent.parent / "vscode" / "bundled" / "start.py"
+if not START.is_file():
+    sys.exit("no bundle in vscode/bundled: run scripts/bundle.py first")
 
 server = subprocess.Popen(
-    [sys.executable, "-m", "loom_language_server"],
+    [sys.executable, "-I", "-S", str(START)],
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
 )
@@ -37,7 +45,16 @@ def receive() -> dict:
 # A request has an id and gets a reply with the same id.
 # A notification has no id and gets no reply.
 try:
-    send({"id": 1, "method": "initialize", "params": {"capabilities": {}}})
+    # As the extension does, tell the server where the bundled loom is
+    synthesis = START.parent / "loom" / "synthesis.py"
+    options = {"synthesis": str(synthesis)}
+    send(
+        {
+            "id": 1,
+            "method": "initialize",
+            "params": {"capabilities": {}, "initializationOptions": options},
+        }
+    )
     receive()
     send({"method": "initialized", "params": {}})
     receive()  # our handler's log message

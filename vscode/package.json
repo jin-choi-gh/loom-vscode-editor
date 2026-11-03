@@ -28,6 +28,28 @@
           "group": "navigation"
         }
       ]
+    },
+    "configuration": {
+      "title": "Loom",
+      "properties": {
+        "loom.python": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "markdownDescription": "The Python that runs loom: 3.12 or newer, as a full path (for example `C:\\Python312\\python.exe` or `/opt/homebrew/bin/python3`). Leave empty to let the extension search for one. Only your user settings can set this, never a folder's own settings."
+        },
+        "loom.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "scope": "window",
+          "description": "Show the messages between VS Code and the loom server in the Loom output, for diagnosing problems."
+        }
+      }
     }
   },
   "scripts": {

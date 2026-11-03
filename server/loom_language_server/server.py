@@ -2,14 +2,15 @@ import json
 import subprocess
 import sys
 import tempfile
-from importlib.metadata import version
 from pathlib import Path
 
 from lsprotocol import types
 from pygls import uris
 from pygls.lsp.server import LanguageServer
 
-server = LanguageServer("loom-language-server", version("loom-language-server"))
+from . import __version__
+
+server = LanguageServer("loom-language-server", __version__)
 
 # loom's synthesis.py, as the editor names it in its initialization options.
 synthesis: Path | None = None
@@ -67,8 +68,20 @@ def compose(synthesis: Path, folder: Path) -> tuple[dict | None, str]:
     """Run loom on a folder: its textual complex as JSON, or loom's error message."""
     with tempfile.TemporaryDirectory() as temporary:
         output = Path(temporary) / "composed.json"
+        # Isolated like the server, but not with -I: loom finds its own modules beside
+        # synthesis.py, so that folder (inside the bundle) must stay on its path. -E, -s and
+        # -S shut out PYTHON… variables and every installed package; the folder being
+        # composed is never on the path.
+        isolated = ["-E", "-s", "-S"]
         result = subprocess.run(
-            [sys.executable, str(synthesis), str(folder), "--json", str(output)],
+            [
+                sys.executable,
+                *isolated,
+                str(synthesis),
+                str(folder),
+                "--json",
+                str(output),
+            ],
             capture_output=True,
             check=False,  # a failure is reported, not raised
             text=True,
