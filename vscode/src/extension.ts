@@ -35,6 +35,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     return
   }
 
+  // loom, from the repository's submodule (see the README). Packaging will bundle a copy instead.
+  const synthesis = path.join(root, "loom", "src", "synthesis.py")
+
   const serverOptions: ServerOptions = {
     command: python,
     args: ["-m", "loom_language_server"],
@@ -48,6 +51,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       { scheme: "file", pattern: "**/*.{display,metre,notes}.txt" },
       { scheme: "file", pattern: "**/meta.toml" },
     ],
+    // What the server is told when it starts: where loom is.
+    initializationOptions: { synthesis },
   }
 
   client = new LanguageClient("loom", "Loom", serverOptions, clientOptions)

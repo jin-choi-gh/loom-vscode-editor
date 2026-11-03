@@ -19,10 +19,12 @@ It has two parts:
 
 **Status:** early. The server starts, answers an editor's opening messages and logs that it has
 started (try `scripts/talk.py`). In VS Code, F5 runs the extension, which starts the server
-(milestone M0, see "Running the extension"). loom's errors are next.
+(milestone M0, see "Running the extension"). On every save, the server composes the saved file's
+folder with loom and sends the result to the extension; the viewer that will draw it is next.
 
 ## Layout
 
+    loom/                      loom itself, as a git submodule: loom's repository at a fixed commit
     server/                    the language server (Python, pygls)
       pyproject.toml           the package and what it needs
       loom_language_server/
@@ -50,6 +52,25 @@ You need:
 - **Python 3.12 or newer**, the version loom is written for. On macOS the built-in `python3` is
   too old: install 3.12 from python.org or with Homebrew (`brew install python@3.12`).
 - **Node.js**, for building the VS Code extension.
+
+### loom
+
+loom is included as a git submodule in `loom/`: this repository records only which commit of
+[loom](https://github.com/jin-choi-gh/loom) it uses, not loom's files. After cloning, fetch it:
+
+    git submodule update --init
+
+(or clone with `git clone --recurse-submodules …` to do both at once). To move to a newer loom,
+update the submodule and commit the new pointer:
+
+    cd loom
+    git pull
+    cd ..
+    git add loom
+    git commit -m "Use loom at <commit>"
+
+Only committed loom reaches the submodule: changes still uncommitted in a loom checkout elsewhere
+are not seen here.
 
 ### The server
 
@@ -98,8 +119,12 @@ From `vscode/`, download its libraries (into `node_modules/`, at the versions in
 2. Press F5. The extension is compiled, then a second window opens, titled
    **[Extension Development Host]**, with our extension loaded and `examples/` open.
 3. In that window, open View › Output and choose **Loom** in the panel's dropdown. It should say
-   `loom-language-server started`.
-4. Close that window to stop; the server stops with it.
+   `loom-language-server started, using …/loom/src/synthesis.py`.
+4. Open `the-sick-rose/display.txt` and save it (Ctrl+S). The log adds
+   `composed the-sick-rose: 8 lines`. If loom cannot compose the folder, it says
+   `could not compose …` with loom's message instead.
+5. Close that window to stop; the server stops with it. After changing the server's code, press F5
+   again: each run starts a fresh server.
 
 If it does not work:
 
@@ -109,6 +134,7 @@ If it does not work:
 | a notification "no Python at …" | `.venv/` is missing: see the development setup |
 | "Loom" is there but empty | the server did not start: try `scripts/talk.py` |
 | F5 asks which debugger to use | the folder open in VS Code is not this repository's |
+| `could not compose …: … can't open file '…synthesis.py'` | the submodule is empty: run `git submodule update --init` |
 
 ## Running the server
 
