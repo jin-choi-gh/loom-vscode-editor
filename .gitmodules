@@ -1,0 +1,3 @@
+[submodule "loom"]
+	path = loom
+	url = https://github.com/jin-choi-gh/loom.git
