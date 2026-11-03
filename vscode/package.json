@@ -33,7 +33,7 @@
   "scripts": {
     "compile": "npm run compile:extension && npm run compile:webview",
     "compile:extension": "tsc -p .",
-    "compile:webview": "tsc -p tsconfig.webview.json && esbuild src/webview/main.tsx --bundle --outfile=out/webview.js --tsconfig=tsconfig.webview.json --sourcemap"
+    "compile:webview": "tsc -p webview && esbuild webview/main.tsx --bundle --outfile=out/webview.js --tsconfig=webview/tsconfig.json --sourcemap"
   },
   "dependencies": {
     "vscode-languageclient": "^11.0.0"

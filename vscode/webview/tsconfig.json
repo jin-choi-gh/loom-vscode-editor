@@ -9,5 +9,5 @@
     "noEmit": true,
     "types": ["vscode-webview"]
   },
-  "include": ["src/webview", "src/loom-viewer"]
+  "include": ["."]
 }

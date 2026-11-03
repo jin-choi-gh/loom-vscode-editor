@@ -35,12 +35,14 @@ folder with loom and sends the result to the extension; the viewer that will dra
     vscode/                    the VS Code extension (TypeScript)
       package.json             its manifest: when it starts, which file it runs, what it needs
       package-lock.json        the exact versions installed (committed)
-      tsconfig.json            how TypeScript compiles the extension (src/*.ts) into out/
-      tsconfig.webview.json    how TypeScript checks the viewer's page (src/webview/, src/loom-viewer/)
+      tsconfig.json            how TypeScript compiles the extension (src/) into out/
       .prettierrc.json         code style, as in anthos-reader
-      src/extension.ts         starts the server and connects VS Code to it
-      src/viewer.ts            the viewer panel beside the editor; its page loads out/webview.js
-      src/webview/main.tsx     the viewer's page (React), bundled with esbuild into out/webview.js
+      src/                     the extension, which runs in VS Code's Node
+        extension.ts           starts the server and connects VS Code to it
+        viewer.ts              the viewer panel beside the editor; its page loads out/webview.js
+      webview/                 the viewer's page, which runs in the panel's browser
+        tsconfig.json          how TypeScript checks it (browser, React)
+        main.tsx               the page (React), bundled with esbuild into out/webview.js
       out/                     the compiled JavaScript VS Code runs (made by the build, not committed)
     examples/                  small loom texts to try the extension on
       the-sick-rose/           Blake, "The Sick Rose" (display.txt, meta.toml)
@@ -116,11 +118,15 @@ From `vscode/`, download its libraries (into `node_modules/`, at the versions in
 The extension has two sides, compiled separately (`npm run compile` does both, and F5 runs it
 before each launch):
 
-- **the extension itself**, which runs in VS Code's Node: `src/*.ts`, compiled by `tsc` with
+- **the extension itself**, which runs in VS Code's Node: `src/`, compiled by `tsc` with
   `tsconfig.json` (`npm run compile:extension`);
-- **the viewer's page**, which runs in the panel's browser: `src/webview/` and `src/loom-viewer/`,
-  type-checked by `tsc` with `tsconfig.webview.json`, then bundled with React by esbuild into
-  `out/webview.js` (`npm run compile:webview`).
+- **the viewer's page**, which runs in the panel's browser: `webview/`, type-checked by `tsc` with
+  `webview/tsconfig.json`, then bundled with React by esbuild into `out/webview.js`
+  (`npm run compile:webview`).
+
+Each side has its own file named `tsconfig.json` above its code, so the editor, `tsc` and esbuild
+all check a file with the same settings. (VS Code looks only for files named exactly
+`tsconfig.json`.)
 
 A successful compile prints only esbuild's summary of the bundle.
 

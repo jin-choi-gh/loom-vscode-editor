@@ -35,7 +35,7 @@ export function showInViewer(message: unknown): void {
   void panel?.webview.postMessage(message)
 }
 
-/** The panel's page: an empty root for the bundled script (src/webview/main.tsx) to draw in. */
+/** The panel's page: an empty root for the bundled script (webview/main.tsx) to draw in. */
 function page(webview: vscode.Webview, script: vscode.Uri): string {
   // A token allowing only our own script and style to run: the page refuses anything else.
   const nonce = randomBytes(16).toString("base64")
