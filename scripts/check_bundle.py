@@ -1,18 +1,23 @@
 """Check the bundled server as the extension starts it, from a folder that tries to trick it.
 
-    .venv/Scripts/python scripts/check_bundle.py      (Windows)
-    .venv/bin/python scripts/check_bundle.py          (macOS / Linux)
+    .venv/Scripts/python scripts/check_bundle.py                (Windows)
+    .venv/bin/python scripts/check_bundle.py                    (macOS / Linux)
+    .venv/Scripts/python scripts/check_bundle.py <file.vsix>    a built package, on any system
 
-Run scripts/bundle.py first. The check starts vscode/bundled/start.py the way the extension
-does (python -I -S), from a folder holding a json.py and a models.py that stop the program if
-they are ever imported, and asks it to compose examples/the-sick-rose. It passes if the poem
-comes back composed and the server wrote nothing to its error output.
+Without a file, it checks vscode/bundled/ (run scripts/bundle.py first). With a package, it
+first checks what the package holds, then unpacks it and checks the server inside it.
+
+The check starts bundled/start.py the way the extension does (python -I -S), from a folder
+holding a json.py and a models.py that stop the program if they are ever imported, and asks it
+to compose examples/the-sick-rose. It passes if the poem comes back composed and the server
+wrote nothing to its error output.
 """
 
 import json
 import subprocess
 import sys
 import tempfile
+import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -24,11 +29,54 @@ EXPECTED_LINES = 8
 # be imported in their place.
 TRAPS = ["json.py", "models.py"]
 
+# What a package must hold, and what must never ship: sources, source maps and caches.
+REQUIRED = [
+    "extension/LICENSE.md",
+    "extension/package.json",
+    "extension/out/extension.js",
+    "extension/out/webview.js",
+    "extension/out/webview.css",
+    "extension/out/THIRD_PARTY_NOTICES.txt",
+    "extension/bundled/start.py",
+    "extension/bundled/BUNDLE.txt",
+    "extension/bundled/THIRD_PARTY_NOTICES.txt",
+    "extension/bundled/loom/synthesis.py",
+]
+FORBIDDEN_ENDINGS = (".ts", ".tsx", ".map", ".pyc", ".mjs")
+FORBIDDEN_PLACES = ("extension/src/", "extension/webview/", "extension/node_modules/")
+
 
 def main() -> None:
-    if not (BUNDLED / "start.py").is_file():
+    if len(sys.argv) > 1:
+        check_package(Path(sys.argv[1]))
+    elif (BUNDLED / "start.py").is_file():
+        check_server(BUNDLED)
+    else:
         sys.exit("no bundle in vscode/bundled: run scripts/bundle.py first")
 
+
+def check_package(package: Path) -> None:
+    """What a built package holds, then the server inside it."""
+    if not package.is_file():
+        sys.exit(f"no such package: {package}")
+    with zipfile.ZipFile(package) as archive:
+        names = archive.namelist()
+        missing = [name for name in REQUIRED if name not in names]
+        forbidden = [
+            name
+            for name in names
+            if name.endswith(FORBIDDEN_ENDINGS) or name.startswith(FORBIDDEN_PLACES)
+        ]
+        if missing or forbidden:
+            sys.exit(f"check failed: missing {missing}, should not ship {forbidden}")
+        print(f"{package.name}: {len(names)} entries, nothing missing or forbidden")
+        with tempfile.TemporaryDirectory() as unpacked:
+            archive.extractall(unpacked)
+            check_server(Path(unpacked) / "extension" / "bundled")
+
+
+def check_server(bundled: Path) -> None:
+    """Start a bundled server from a folder of traps, and have it compose the example."""
     with tempfile.TemporaryDirectory() as folder:
         for name in TRAPS:
             (Path(folder) / name).write_text(
@@ -36,14 +84,14 @@ def main() -> None:
                 encoding="utf-8",
             )
         server = subprocess.Popen(
-            [sys.executable, "-I", "-S", str(BUNDLED / "start.py")],
+            [sys.executable, "-I", "-S", str(bundled / "start.py")],
             cwd=folder,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
         try:
-            composed = converse(server)
+            composed = converse(server, bundled)
         except ServerGone:
             composed = None
         finally:
@@ -67,9 +115,9 @@ def main() -> None:
     print(f"check passed: composed {EXAMPLE.parent.name} from a folder holding {TRAPS}")
 
 
-def converse(server: subprocess.Popen) -> dict:
+def converse(server: subprocess.Popen, bundled: Path) -> dict:
     """Start the server, ask it to compose the example, and return what it sends back."""
-    synthesis = BUNDLED / "loom" / "synthesis.py"
+    synthesis = bundled / "loom" / "synthesis.py"
     send(
         server,
         {

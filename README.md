@@ -23,7 +23,7 @@ started (try `scripts/talk.py`). In VS Code, F5 runs the extension, which starts
 folder with loom, and the viewer beside the editor draws the result with loom-viewer: the poem as
 anthos-reader draws it, with its notes in a margin (milestone M2). The extension carries its own
 server, loom and their libraries, and finds a Python by itself on Windows, macOS and Linux; making
-it into a file that others can install is next.
+it into a file that others can install is done with `scripts/package.mjs` (see "Packaging").
 
 **Licence:** proprietary and closed-source: see `vscode/LICENSE.md`. Copyright © 2026 Univerbum
 Studios. All rights reserved.
@@ -86,6 +86,7 @@ or `node scripts/find_python.mjs <path>` to try a Python as if it were set in `l
       talk.py                  plays the editor, to see the server's messages by hand
       bundle.py                gathers what the server needs into vscode/bundled/
       find_python.mjs          shows which Python the extension would choose, and what it tried
+      package.mjs              builds and checks the package, dist/loom-editor-<version>.vsix
       check_bundle.py          checks the bundled server, started from a folder that tries to trick it
     vscode/                    the VS Code extension (TypeScript)
       package.json             its manifest: when it starts, which file it runs, what it needs
@@ -119,6 +120,7 @@ or `node scripts/find_python.mjs <path>` to try a Python as if it were set in `l
       launch.json              F5: run the extension in a second window, on examples/
       tasks.json               before each run: bundles the server, then compiles the extension
     ruff.toml                  how ruff checks the Python (as loom's: Python 3.12, its default rules)
+    dist/                      built packages (made by scripts/package.mjs, not committed)
 
 ## Development setup
 
@@ -296,6 +298,32 @@ If it does not work:
 | F5 asks which debugger to use                         | the folder open in VS Code is not this repository's                                             |
 | F5 stops with `loom/ is empty: fetch the submodule …` | the submodule is empty: run `git submodule update --init`                                       |
 | a notification "no server bundle at …"                | the bundle is missing: run `scripts/bundle.py` (F5 does)                                        |
+
+## Packaging
+
+From this repository's root:
+
+    node scripts/package.mjs
+
+makes `dist/loom-editor-<version>.vsix`. Each step must succeed before the next:
+
+1. it stops if `loom/src` has uncommitted changes: only committed loom ships;
+2. `scripts/bundle.py` makes a fresh bundle;
+3. `npm run compile:production` makes the shipping build;
+4. `vsce package` makes the file, holding only what `vscode/.vscodeignore` names;
+5. `scripts/check_bundle.py <file>` checks the file itself: everything required is in it, no
+   sources, source maps or caches are, and the server inside it passes the trap check;
+6. `npm run compile` puts `out/` back to the development build, for F5.
+
+**The package holds loom's source**, and a `.vsix` is only a zip. Give it directly to the people
+it is meant for, under its licence, and never put it in git or anywhere public. `.gitignore` keeps
+`*.vsix` and `dist/` out of the repository.
+
+To try a package as a new user would, in a profile of its own, so that nothing of yours hides a
+problem (Windows PowerShell):
+
+    code --user-data-dir $env:TEMP\loom-test\profile --extensions-dir $env:TEMP\loom-test\exts --install-extension dist\loom-editor-0.1.0.vsix
+    code --user-data-dir $env:TEMP\loom-test\profile --extensions-dir $env:TEMP\loom-test\exts examples
 
 ## Running the server
 
