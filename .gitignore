@@ -5,3 +5,5 @@ __pycache__/
 node_modules/
 out/
 vscode/bundled/
+*.vsix
+dist/

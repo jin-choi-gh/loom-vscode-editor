@@ -1,0 +1,18 @@
+# What goes into the package: everything is left out, then named. A new file stays out unless it
+# is listed here, so sources, source maps and node_modules cannot ship by accident. vsce applies
+# every `!` line whatever follows it, so a folder cannot be named with exceptions: bundled/ is
+# listed by kind of file, which also leaves out the __pycache__ folders that running the server
+# writes there.
+**
+!package.json
+!LICENSE.md
+!README.md
+!out/extension.js
+!out/webview.js
+!out/webview.css
+!out/THIRD_PARTY_NOTICES.txt
+!bundled/*.txt
+!bundled/**/*.py
+!bundled/**/*.pyi
+!bundled/**/py.typed
+!bundled/**/*.dist-info/**

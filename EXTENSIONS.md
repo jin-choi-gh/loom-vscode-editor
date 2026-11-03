@@ -47,8 +47,9 @@ milestones in the README say what comes next; this file holds what was set aside
 - [ ] **Watching both sides.** `npm run compile` is run by F5 before each launch, so no watch is
       needed. A watch would need two processes at once (`tsc --watch` for the extension, esbuild's
       `--watch` for the page).
-- [ ] **A production build:** minified, with React's production build, and the extension itself
-      bundled by esbuild so that the package needs no `node_modules`. Part of packaging.
+- [x] **A production build:** minified, with React's production build, and the extension itself
+      bundled by esbuild so that the package needs no `node_modules`. Built in `vscode/build.mjs`
+      (`npm run compile:production`).
 
 ## The server
 
@@ -76,6 +77,14 @@ milestones in the README say what comes next; this file holds what was set aside
 
 ## Packaging and safety
 
-- [ ] **Workspace Trust.** Declare how the extension behaves in folders VS Code does not trust
-      (`capabilities.untrustedWorkspaces` in `package.json`). Any setting that names a program to
-      run must be machine-scoped, so a downloaded folder cannot set it.
+- [x] **Workspace Trust.** The extension does not run in folders VS Code does not trust
+      (`capabilities.untrustedWorkspaces` in `package.json`), and `loom.python`, which names a
+      program to run, is machine-scoped, so a downloaded folder cannot set it.
+- [ ] **An icon**, for the Extensions list, once the name is final.
+- [ ] **Compiling loom** for a public release. A `.vsix` is a zip, so whoever has the file can read
+      loom's Python source; only the licence forbids reusing it. That is acceptable for people
+      chosen by hand, not for a public listing. Direction: compile loom per system with Nuitka,
+      built by GitHub Actions, with one package per system (`vsce package --target …`). That also
+      removes the need for users to install Python. On macOS the program may need signing.
+- [ ] **Final names.** The publisher (`jin-choi`) and the copyright holder are provisional. The
+      licence should name a legal entity, and be reviewed by a lawyer before wider use.

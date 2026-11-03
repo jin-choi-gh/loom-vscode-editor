@@ -1,11 +1,23 @@
 {
   "name": "loom-editor",
   "displayName": "Loom Editor",
-  "description": "Editing loom's source files: errors where you type, from the loom language server",
+  "description": "Write loom's source files, and see the poem drawn beside them",
+  "publisher": "jin-choi",
   "version": "0.1.0",
+  "license": "SEE LICENSE IN LICENSE.md",
   "private": true,
+  "categories": [
+    "Other"
+  ],
   "engines": {
     "vscode": "^1.91.0"
+  },
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "Loom Editor runs Python on the files of the open folder, so it runs only in folders you trust."
+    },
+    "virtualWorkspaces": false
   },
   "activationEvents": [
     "workspaceContains:**/*display.txt"
@@ -15,7 +27,7 @@
     "commands": [
       {
         "command": "loom.openViewer",
-        "title": "Loom: Open Viewer",
+        "title": "Open Viewer",
         "category": "Loom",
         "icon": "$(open-preview)"
       }
@@ -53,12 +65,9 @@
     }
   },
   "scripts": {
-    "compile": "npm run compile:extension && npm run compile:webview",
-    "compile:extension": "tsc -p .",
-    "compile:webview": "tsc -p webview && esbuild webview/main.tsx --bundle --outfile=out/webview.js --tsconfig=webview/tsconfig.json --sourcemap"
-  },
-  "dependencies": {
-    "vscode-languageclient": "^11.0.0"
+    "check": "tsc -p . && tsc -p webview",
+    "compile": "npm run check && node build.mjs",
+    "compile:production": "npm run check && node build.mjs --production"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
@@ -66,9 +75,11 @@
     "@types/react-dom": "^19.3.0",
     "@types/vscode": "~1.91.0",
     "@types/vscode-webview": "^1.57.5",
+    "@vscode/vsce": "4.1.0",
     "esbuild": "^0.28.2",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vscode-languageclient": "^11.0.0"
   }
 }

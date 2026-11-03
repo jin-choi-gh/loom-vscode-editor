@@ -3,11 +3,9 @@
     "module": "node16",
     "target": "es2022",
     "lib": ["es2022"],
-    "outDir": "out",
-    "rootDir": "src",
     "strict": true,
-    "sourceMap": true,
-    "types": ["node", "vscode"]
+    "types": ["node", "vscode"],
+    "noEmit": true
   },
   "include": ["src"]
 }

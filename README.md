@@ -25,6 +25,9 @@ anthos-reader draws it, with its notes in a margin (milestone M2). The extension
 server, loom and their libraries, and finds a Python by itself on Windows, macOS and Linux; making
 it into a file that others can install is next.
 
+**Licence:** proprietary and closed-source: see `vscode/LICENSE.md`. Copyright © 2026 Univerbum
+Studios. All rights reserved.
+
 ## Installing
 
 For someone given the extension as a file (`loom-editor-<version>.vsix`):
@@ -42,7 +45,9 @@ For someone given the extension as a file (`loom-editor-<version>.vsix`):
    the editor's top right: the poem appears beside it, and is redrawn each time the file is saved.
 
 The extension finds Python by itself (see "Settings"). What it found, and everything it tried, is in
-View › Output › **Loom**. If it finds none, or not the one you want, name it in `loom.python`.
+View › Output › **Loom**. If it finds none, or not the one you want, name it in `loom.python`. It
+runs Python on the open folder's files, so it stays off in folders VS Code has not been told to
+trust.
 
 ## Settings
 
@@ -84,8 +89,12 @@ or `node scripts/find_python.mjs <path>` to try a Python as if it were set in `l
       check_bundle.py          checks the bundled server, started from a folder that tries to trick it
     vscode/                    the VS Code extension (TypeScript)
       package.json             its manifest: when it starts, which file it runs, what it needs
+      README.md                what users see: the extension's own page (this file is for developers)
+      LICENSE.md               the licence the package ships under
+      .vscodeignore            what goes into the package: everything else stays out
       package-lock.json        the exact versions installed (committed)
-      tsconfig.json            how TypeScript compiles the extension (src/) into out/
+      build.mjs                builds src/ and webview/ into out/ (with esbuild)
+      tsconfig.json            how TypeScript checks the extension (src/)
       .prettierrc.json         code style, as in anthos-reader
       src/                     the extension, which runs in VS Code's Node
         extension.ts           starts the server and connects VS Code to it
@@ -99,7 +108,8 @@ or `node scripts/find_python.mjs <path>` to try a Python as if it were set in `l
                                out/webview.css
         loom-viewer/           draws a poem and its notes from loom's JSON: a temporary copy of
                                anthos-reader's, to become its own repository (see its README)
-      out/                     the compiled JavaScript VS Code runs (made by the build, not committed)
+      out/                     the JavaScript VS Code runs, and its libraries' licences (made by
+                               build.mjs, not committed)
       bundled/                 what ships for the server: our server, loom, its libraries and their
                                licences (made by scripts/bundle.py, not committed)
     examples/                  small loom texts to try the extension on
@@ -178,20 +188,29 @@ From `vscode/`, download its libraries (into `node_modules/`, at the versions in
     npm install
     npm run compile
 
-The extension has two sides, compiled separately (`npm run compile` does both, and F5 runs it
-before each launch):
+The extension has two sides, each checked by `tsc` with its own `tsconfig.json`:
 
-- **the extension itself**, which runs in VS Code's Node: `src/`, compiled by `tsc` with
-  `tsconfig.json` (`npm run compile:extension`);
-- **the viewer's page**, which runs in the panel's browser: `webview/`, type-checked by `tsc` with
-  `webview/tsconfig.json`, then bundled with React by esbuild into `out/webview.js`
-  (`npm run compile:webview`).
+- **the extension itself**, which runs in VS Code's Node: `src/`, checked with `tsconfig.json`;
+- **the viewer's page**, which runs in the panel's browser: `webview/`, checked with
+  `webview/tsconfig.json`.
 
-Each side has its own file named `tsconfig.json` above its code, so the editor, `tsc` and esbuild
-all check a file with the same settings. (VS Code looks only for files named exactly
-`tsconfig.json`.)
+Each side has its own file named `tsconfig.json` above its code, so the editor and `tsc` check a
+file with the same settings. (VS Code looks only for files named exactly `tsconfig.json`.)
 
-A successful compile prints only esbuild's summary of the bundle.
+`build.mjs` then bundles each side with esbuild into one file in `out/`, libraries included, so
+that the package needs no `node_modules`. There are two builds:
+
+| command                      | builds                                                                | used by   |
+| ---------------------------- | --------------------------------------------------------------------- | --------- |
+| `npm run compile`            | for development: readable, with source maps                           | F5        |
+| `npm run compile:production` | for shipping: minified, with React's production build, no source maps | packaging |
+
+Source maps are left out of the shipped build because they would carry the original source. Each
+build also writes `out/THIRD_PARTY_NOTICES.txt`: every package esbuild actually bundled, with its
+licence in full. (The Python libraries have their own notices, in the bundle, below.) If a package
+has no licence text, the build stops.
+
+`npm run check` runs the two type-checks alone.
 
 ### The bundle
 
@@ -255,7 +274,7 @@ place. loom is not run with `-I`, because it finds its own modules beside `synth
 
 4. Open `the-sick-rose/display.txt`, then open the viewer: the preview icon at the editor's top
    right, or Ctrl+Shift+P › **Loom: Open Viewer**. A panel beside the file shows the title and the
-   poem (every fifth line numbered), with the notes in a margin on the right; the log adds
+   poem (every line labelled with its id), with the notes in a margin on the right; the log adds
    `composed the-sick-rose: 8 lines`.
 5. Click a note: its words are marked in the poem, in the colour of the note's box. Click it again
    to clear the mark.
