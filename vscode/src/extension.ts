@@ -6,6 +6,7 @@ import {
   type LanguageClientOptions,
   type ServerOptions,
 } from "vscode-languageclient/node"
+import { openViewer, showInViewer } from "./viewer"
 
 let client: LanguageClient | undefined
 
@@ -56,7 +57,25 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   }
 
   client = new LanguageClient("loom", "Loom", serverOptions, clientOptions)
+
+  // What the server composes goes to the viewer, marked with its kind for the page.
+  client.onNotification("loom/composed", (params) => showInViewer({ kind: "composed", ...params }))
+  client.onNotification("loom/failed", (params) => showInViewer({ kind: "failed", ...params }))
+  context.subscriptions.push(
+    vscode.commands.registerCommand("loom.openViewer", () =>
+      openViewer(context.extensionUri, composeActiveFile),
+    ),
+  )
+
   await client.start()
+}
+
+/** Ask the server to compose the folder of the file in the active editor, if any. */
+function composeActiveFile(): void {
+  const document = vscode.window.activeTextEditor?.document
+  if (document !== undefined) {
+    void client?.sendNotification("loom/compose", { uri: document.uri.toString() })
+  }
 }
 
 /** Called by VS Code when the extension stops: stop the server with it. */

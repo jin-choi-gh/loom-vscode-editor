@@ -32,8 +32,19 @@ def initialized(ls: LanguageServer, params: types.InitializedParams) -> None:
 
 @server.feature(types.TEXT_DOCUMENT_DID_SAVE)
 def did_save(ls: LanguageServer, params: types.DidSaveTextDocumentParams) -> None:
-    """A file was saved: compose its folder, and send the editor the result."""
-    path = uris.to_fs_path(params.text_document.uri)
+    """A file was saved: compose its folder."""
+    compose_and_send(ls, params.text_document.uri)
+
+
+@server.feature("loom/compose")
+def compose_now(ls: LanguageServer, params) -> None:
+    """The editor asks for a file's folder to be composed now: the viewer has just opened."""
+    compose_and_send(ls, params.uri)
+
+
+def compose_and_send(ls: LanguageServer, uri: str) -> None:
+    """Compose the folder of the file at uri, and send the editor the result."""
+    path = uris.to_fs_path(uri)
     if path is None:
         return
     folder = Path(path).parent

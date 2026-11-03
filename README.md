@@ -35,9 +35,12 @@ folder with loom and sends the result to the extension; the viewer that will dra
     vscode/                    the VS Code extension (TypeScript)
       package.json             its manifest: when it starts, which file it runs, what it needs
       package-lock.json        the exact versions installed (committed)
-      tsconfig.json            how TypeScript compiles src/ into out/
+      tsconfig.json            how TypeScript compiles the extension (src/*.ts) into out/
+      tsconfig.webview.json    how TypeScript checks the viewer's page (src/webview/, src/loom-viewer/)
       .prettierrc.json         code style, as in anthos-reader
       src/extension.ts         starts the server and connects VS Code to it
+      src/viewer.ts            the viewer panel beside the editor; its page loads out/webview.js
+      src/webview/main.tsx     the viewer's page (React), bundled with esbuild into out/webview.js
       out/                     the compiled JavaScript VS Code runs (made by the build, not committed)
     examples/                  small loom texts to try the extension on
       the-sick-rose/           Blake, "The Sick Rose" (display.txt, meta.toml)
@@ -105,12 +108,21 @@ may install into your system's Python instead.
 ### The extension
 
 From `vscode/`, download its libraries (into `node_modules/`, at the versions in
-`package-lock.json`) and compile it (`src/` into `out/`):
+`package-lock.json`) and compile it into `out/`:
 
     npm install
     npm run compile
 
-`npm run watch` recompiles on every save instead. A successful compile prints nothing.
+The extension has two sides, compiled separately (`npm run compile` does both, and F5 runs it
+before each launch):
+
+- **the extension itself**, which runs in VS Code's Node: `src/*.ts`, compiled by `tsc` with
+  `tsconfig.json` (`npm run compile:extension`);
+- **the viewer's page**, which runs in the panel's browser: `src/webview/` and `src/loom-viewer/`,
+  type-checked by `tsc` with `tsconfig.webview.json`, then bundled with React by esbuild into
+  `out/webview.js` (`npm run compile:webview`).
+
+A successful compile prints only esbuild's summary of the bundle.
 
 ## Running the extension
 
@@ -120,10 +132,13 @@ From `vscode/`, download its libraries (into `node_modules/`, at the versions in
    **[Extension Development Host]**, with our extension loaded and `examples/` open.
 3. In that window, open View › Output and choose **Loom** in the panel's dropdown. It should say
    `loom-language-server started, using …/loom/src/synthesis.py`.
-4. Open `the-sick-rose/display.txt` and save it (Ctrl+S). The log adds
-   `composed the-sick-rose: 8 lines`. If loom cannot compose the folder, it says
-   `could not compose …` with loom's message instead.
-5. Close that window to stop; the server stops with it. After changing the server's code, press F5
+4. Open `the-sick-rose/display.txt`, then open the viewer: the preview icon at the editor's top
+   right, or Ctrl+Shift+P › **Loom: Open Viewer**. A panel beside the file shows the poem, and the
+   log adds `composed the-sick-rose: 8 lines`.
+5. Change the file and save it (Ctrl+S): the panel shows the change. If loom cannot compose the
+   folder, the panel shows loom's message instead, and the log says `could not compose …`.
+   (VS Code does not save a file with no changes, so an unchanged file sends nothing.)
+6. Close that window to stop; the server stops with it. After changing the server's code, press F5
    again: each run starts a fresh server.
 
 If it does not work:

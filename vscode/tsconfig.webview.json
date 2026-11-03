@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2022",
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "types": ["vscode-webview"]
+  },
+  "include": ["src/webview", "src/loom-viewer"]
+}

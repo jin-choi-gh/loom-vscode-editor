@@ -4,21 +4,49 @@
   "description": "Editing loom's source files: errors where you type, from the loom language server",
   "version": "0.1.0",
   "private": true,
-  "engines": { "vscode": "^1.91.0" },
+  "engines": {
+    "vscode": "^1.91.0"
+  },
   "activationEvents": [
     "workspaceContains:**/*display.txt"
   ],
   "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "loom.openViewer",
+        "title": "Loom: Open Viewer",
+        "category": "Loom",
+        "icon": "$(open-preview)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "loom.openViewer",
+          "when": "resourceFilename =~ /(^|\\.)(display|metre|notes)\\.txt$|^meta\\.toml$/",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
   "scripts": {
-    "compile": "tsc -p .",
-    "watch": "tsc -watch -p ."
+    "compile": "npm run compile:extension && npm run compile:webview",
+    "compile:extension": "tsc -p .",
+    "compile:webview": "tsc -p tsconfig.webview.json && esbuild src/webview/main.tsx --bundle --outfile=out/webview.js --tsconfig=tsconfig.webview.json --sourcemap"
   },
   "dependencies": {
     "vscode-languageclient": "^11.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "@types/vscode": "~1.91.0",
+    "@types/vscode-webview": "^1.57.5",
+    "esbuild": "^0.28.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "typescript": "^7.0.2"
   }
 }
