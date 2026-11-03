@@ -20,7 +20,9 @@ It has two parts:
 **Status:** early. The server starts, answers an editor's opening messages and logs that it has
 started (try `scripts/talk.py`). In VS Code, F5 runs the extension, which starts the server
 (milestone M0, see "Running the extension"). On every save, the server composes the saved file's
-folder with loom and sends the result to the extension; the viewer that will draw it is next.
+folder with loom, and the viewer beside the editor draws the result with loom-viewer: the poem as
+anthos-reader draws it, with its notes in a margin (milestone M2). Packaging the extension, so
+that others can install it, is next.
 
 ## Layout
 
@@ -42,10 +44,16 @@ folder with loom and sends the result to the extension; the viewer that will dra
         viewer.ts              the viewer panel beside the editor; its page loads out/webview.js
       webview/                 the viewer's page, which runs in the panel's browser
         tsconfig.json          how TypeScript checks it (browser, React)
-        main.tsx               the page (React), bundled with esbuild into out/webview.js
+        css.d.ts               tells TypeScript that CSS files can be imported (esbuild bundles them)
+        main.tsx               the page (React): receives what the server composed and draws it
+                               with loom-viewer; bundled by esbuild into out/webview.js and
+                               out/webview.css
+        loom-viewer/           draws a poem and its notes from loom's JSON: a temporary copy of
+                               anthos-reader's, to become its own repository (see its README)
       out/                     the compiled JavaScript VS Code runs (made by the build, not committed)
     examples/                  small loom texts to try the extension on
-      the-sick-rose/           Blake, "The Sick Rose" (display.txt, meta.toml)
+      the-sick-rose/           Blake, "The Sick Rose" (display.txt, meta.toml), with a few notes
+                               of our own (notes.txt) to fill the viewer's margin
     .vscode/                   VS Code's settings for working on this repository
       launch.json              F5: run the extension in a second window, on examples/
       tasks.json               compiles the extension before each run
@@ -139,12 +147,16 @@ A successful compile prints only esbuild's summary of the bundle.
 3. In that window, open View › Output and choose **Loom** in the panel's dropdown. It should say
    `loom-language-server started, using …/loom/src/synthesis.py`.
 4. Open `the-sick-rose/display.txt`, then open the viewer: the preview icon at the editor's top
-   right, or Ctrl+Shift+P › **Loom: Open Viewer**. A panel beside the file shows the poem, and the
-   log adds `composed the-sick-rose: 8 lines`.
-5. Change the file and save it (Ctrl+S): the panel shows the change. If loom cannot compose the
-   folder, the panel shows loom's message instead, and the log says `could not compose …`.
-   (VS Code does not save a file with no changes, so an unchanged file sends nothing.)
-6. Close that window to stop; the server stops with it. After changing the server's code, press F5
+   right, or Ctrl+Shift+P › **Loom: Open Viewer**. A panel beside the file shows the title and the
+   poem (every fifth line numbered), with the notes in a margin on the right; the log adds
+   `composed the-sick-rose: 8 lines`.
+5. Click a note: its words are marked in the poem, in the colour of the note's box. Click it again
+   to clear the mark.
+6. Change the file and save it (Ctrl+S): the panel shows the change, and a selected note stays
+   selected. If loom cannot compose the folder, the panel shows loom's message instead, and the log
+   says `could not compose …`. (VS Code does not save a file with no changes, so an unchanged file
+   sends nothing.)
+7. Close that window to stop; the server stops with it. After changing the server's code, press F5
    again: each run starts a fresh server.
 
 If it does not work:
@@ -195,6 +207,8 @@ The `capabilities` are what the server asks of the editor (for example `"save": 
 yet told about saves). They grow as features are added.
 
 ## Milestones
+
+What has been discussed and deliberately set aside is listed in [EXTENSIONS.md](EXTENSIONS.md).
 
 | | what you see |
 | --- | --- |

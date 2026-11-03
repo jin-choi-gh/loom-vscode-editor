@@ -1,0 +1,173 @@
+:root {
+  --highlight: #c4f6fb; /* the selected note, and its passages in the poem */
+}
+
+/* A: page */
+.reader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "text";
+  padding: 3rem 16px 4rem 3rem; /* left padding leaves room for line numbers */
+}
+
+/* C: spread */
+.reader[data-layout="spread"] {
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+  grid-template-areas: "text margin";
+  column-gap: 4rem;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 3rem;
+}
+
+.reader-text {
+  grid-area: text;
+}
+
+/* Room above whatever scrolls into view, in both layouts */
+html {
+  scroll-padding-top: 2rem;
+}
+
+/* Centre title and poem together by the longest line; keep both left-aligned */
+.text-block {
+  width: max-content;
+  max-width: 100%;
+  margin-inline: auto;
+  font-family: "Literata", Georgia, serif;
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+/* Title block: 2 poem lines of space before the poem */
+.title-block {
+  margin-bottom: 2lh;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.25em;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.poet {
+  margin: 0.25em 0 0;
+  font-family: system-ui, sans-serif;
+  font-size: 0.7em;
+  letter-spacing: 0.02em;
+  opacity: 0.6;
+}
+
+.stanza + .stanza {
+  margin-top: 1.6em;
+}
+
+.line {
+  position: relative;
+  margin-inline-start: calc(var(--indent) * 1em);
+}
+
+/* Hanging indent: a line too long to fit turns over, indented 2em */
+.line-text {
+  display: block;
+  padding-inline-start: 2em;
+  text-indent: -2em;
+}
+
+/* Numbers sit outside the block, so they don't affect its centring */
+.line-number {
+  position: absolute;
+  inset-inline-end: 100%;
+  padding-inline-end: 1em;
+  font-size: 0.7em;
+  line-height: calc(1.6em / 0.7); /* align with the line's first baseline */
+  font-variant-numeric: tabular-nums;
+  opacity: 0.5;
+  user-select: none;
+}
+
+/* Spread: the margin stays in view, level with the title, and scrolls on its own, never the poem.
+   7rem is the reader's padding above (3rem) and below (4rem), so the margin always fits the window. */
+.margin {
+  grid-area: margin;
+  font-family: system-ui, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  align-self: start;
+  position: sticky;
+  top: 3rem;
+  max-height: calc(100dvh - 7rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.margin-empty {
+  margin: 0;
+  opacity: 0.5;
+}
+
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Each note in its own box; the whole box is what you click */
+.note {
+  padding: 0.75rem 1rem;
+  border: 1px solid rgb(0 0 0 / 0.12);
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+.note:hover {
+  border-color: rgb(0 0 0 / 0.3);
+}
+
+.note[data-selected="true"] {
+  background: var(--highlight);
+  border-color: #d9b54a;
+}
+
+/* Keyboard focus is on the lemma's button, but the ring goes round the whole box */
+.note:has(.note-lemma:focus-visible) {
+  outline: 2px solid #3b6fd8;
+  outline-offset: 2px;
+}
+
+/* The lemma: a button that looks like the head of a commentary entry */
+.note-lemma {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.note-lemma:focus-visible {
+  outline: none;
+}
+
+/* Quotes from the poem in italics, without quotation marks; citations ("lines 1–4") upright */
+.note-lemma q {
+  quotes: none;
+  font-style: italic;
+}
+
+.note p {
+  margin: 0.5em 0 0;
+}
+
+/* The selected note's words in the poem: the same colour as its box, so the two read together */
+.line-text mark {
+  background: var(--highlight);
+  color: inherit;
+}

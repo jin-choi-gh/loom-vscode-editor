@@ -13,7 +13,7 @@ export function openViewer(extensionUri: vscode.Uri, onReady: () => void): void 
     onReady()
     return
   }
-  // The page may load files from out/ only: its bundled script.
+  // The page may load files from out/ only: its bundled script and stylesheet.
   const out = vscode.Uri.joinPath(extensionUri, "out")
   panel = vscode.window.createWebviewPanel(
     "loom.viewer",
@@ -21,7 +21,7 @@ export function openViewer(extensionUri: vscode.Uri, onReady: () => void): void 
     { viewColumn: vscode.ViewColumn.Beside, preserveFocus: true },
     { enableScripts: true, localResourceRoots: [out] },
   )
-  panel.webview.html = page(panel.webview, vscode.Uri.joinPath(out, "webview.js"))
+  panel.webview.html = page(panel.webview, out)
   panel.webview.onDidReceiveMessage((message: { kind?: string }) => {
     if (message.kind === "ready") onReady()
   })
@@ -35,8 +35,11 @@ export function showInViewer(message: unknown): void {
   void panel?.webview.postMessage(message)
 }
 
-/** The panel's page: an empty root for the bundled script (webview/main.tsx) to draw in. */
-function page(webview: vscode.Webview, script: vscode.Uri): string {
+/** The panel's page: an empty root for the bundled script (webview/main.tsx) to draw in, and the
+ * stylesheet bundled with it (loom-viewer's viewer.css). */
+function page(webview: vscode.Webview, out: vscode.Uri): string {
+  const script = webview.asWebviewUri(vscode.Uri.joinPath(out, "webview.js"))
+  const stylesheet = webview.asWebviewUri(vscode.Uri.joinPath(out, "webview.css"))
   // A token allowing only our own script and style to run: the page refuses anything else.
   const nonce = randomBytes(16).toString("base64")
   return `<!doctype html>
@@ -48,6 +51,7 @@ function page(webview: vscode.Webview, script: vscode.Uri): string {
       content="default-src 'none'; style-src ${webview.cspSource} 'nonce-${nonce}'; script-src 'nonce-${nonce}';"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="${stylesheet}" />
     <style nonce="${nonce}">
       body { font-family: var(--vscode-editor-font-family); }
       .error { color: var(--vscode-errorForeground); white-space: pre-wrap; }
@@ -55,7 +59,7 @@ function page(webview: vscode.Webview, script: vscode.Uri): string {
   </head>
   <body>
     <div id="root"></div>
-    <script nonce="${nonce}" src="${webview.asWebviewUri(script)}"></script>
+    <script nonce="${nonce}" src="${script}"></script>
   </body>
 </html>`
 }
