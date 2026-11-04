@@ -1,5 +1,15 @@
 # Loom Editor
 
+**To build the extension from a fresh clone**, run this from the repository's root:
+
+    powershell -ExecutionPolicy Bypass -File build-dist-scripts\build_vsix.ps1     # Windows
+    sh build-dist-scripts/build_vsix.sh                                            # macOS / Linux
+
+You need git, Node.js and Python 3.12 or newer. The result is `dist/loom-editor-<version>.vsix`. It
+holds loom's source, so keep it out of git and anywhere public (see "Packaging").
+
+---
+
 A VS Code extension for writing [loom](../loom)'s source files (`display.txt`, `metre.txt`,
 `notes.txt`, `meta.toml`). It is meant to:
 
@@ -121,6 +131,10 @@ or `node scripts/find_python.mjs <path>` to try a Python as if it were set in `l
       tasks.json               before each run: bundles the server, then compiles the extension
     ruff.toml                  how ruff checks the Python (as loom's: Python 3.12, its default rules)
     dist/                      built packages (made by scripts/package.mjs, not committed)
+    build-dist-scripts/        from a fresh clone to a package, in one command
+      build_vsix.ps1           on Windows
+      build_vsix.sh            on macOS and Linux
+    .gitattributes             keeps .sh files on LF line endings, which sh needs
 
 ## Development setup
 
@@ -301,11 +315,19 @@ If it does not work:
 
 ## Packaging
 
-From this repository's root:
+From a fresh clone, one command does everything. It needs git, Node.js and Python 3.12 or newer;
+it fetches loom, makes `.venv`, installs the extension's libraries at their locked versions
+(`npm ci`), and builds the package. It is safe to run again.
+
+    powershell -ExecutionPolicy Bypass -File build-dist-scripts\build_vsix.ps1     # Windows
+    sh build-dist-scripts/build_vsix.sh                                            # macOS / Linux
+
+With everything set up already, from this repository's root:
 
     node scripts/package.mjs
 
-makes `dist/loom-editor-<version>.vsix`. Each step must succeed before the next:
+makes `dist/loom-editor-<version>.vsix`. If loom, `.venv` or `vscode/node_modules` is missing, it
+says so and stops. Otherwise, each step must succeed before the next:
 
 1. it stops if `loom/src` has uncommitted changes: only committed loom ships;
 2. `scripts/bundle.py` makes a fresh bundle;

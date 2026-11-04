@@ -6,7 +6,7 @@
 // public (see vscode/LICENSE.md). Each step must succeed before the next.
 
 import { execFileSync } from "node:child_process"
-import { mkdirSync, readFileSync } from "node:fs"
+import { existsSync, mkdirSync, readFileSync } from "node:fs"
 import path from "node:path"
 
 const ROOT = path.resolve(import.meta.dirname, "..")
@@ -29,6 +29,22 @@ function run(program, args, cwd = ROOT) {
 /** Run an npm script. npm is a command script on Windows, which needs a shell to start. */
 function npm(script) {
   execFileSync(`npm run ${script}`, { cwd: VSCODE, stdio: "inherit", shell: true })
+}
+
+// What git does not bring: a fresh clone has none of these. Everything missing is said at once.
+const missing = []
+if (!existsSync(path.join(ROOT, "loom", "src", "synthesis.py"))) {
+  missing.push("loom/ is empty: run `git submodule update --init`")
+}
+if (!existsSync(PYTHON)) {
+  missing.push(`no ${path.relative(ROOT, PYTHON)}: see "The server" in the README`)
+}
+if (!existsSync(VSCE)) {
+  missing.push("no vscode/node_modules: run `npm install` in vscode/")
+}
+if (missing.length > 0) {
+  console.error(`cannot package yet:\n- ${missing.join("\n- ")}`)
+  process.exit(1)
 }
 
 // Only committed loom ships: BUNDLE.txt names a commit, and that must say what is in the package.
