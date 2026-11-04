@@ -36,6 +36,10 @@ done
 python=$(find_python) || fail "no Python 3.12 or newer: on macOS, install one from python.org or with \`brew install python@3.12\`; on Linux, with your package manager, for example \`sudo apt install python3.12\`"
 
 echo "== loom"
+# Updating would quietly move loom back to the recorded commit, and package that instead.
+case "$(git submodule status loom)" in
++*) fail "loom/ is not at the commit this repository records. Commit the new pointer (git add loom, then git commit), or go back to the recorded commit (git submodule update)" ;;
+esac
 git submodule update --init
 
 echo "== the Python environment"

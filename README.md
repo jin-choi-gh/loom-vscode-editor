@@ -317,7 +317,8 @@ If it does not work:
 
 From a fresh clone, one command does everything. It needs git, Node.js and Python 3.12 or newer;
 it fetches loom, makes `.venv`, installs the extension's libraries at their locked versions
-(`npm ci`), and builds the package. It is safe to run again.
+(`npm ci`), and builds the package. It is safe to run again. If `loom/` is not at the commit this
+repository records, it stops and says so, rather than packaging another loom.
 
     powershell -ExecutionPolicy Bypass -File build-dist-scripts\build_vsix.ps1     # Windows
     sh build-dist-scripts/build_vsix.sh                                            # macOS / Linux
@@ -329,7 +330,9 @@ With everything set up already, from this repository's root:
 makes `dist/loom-editor-<version>.vsix`. If loom, `.venv` or `vscode/node_modules` is missing, it
 says so and stops. Otherwise, each step must succeed before the next:
 
-1. it stops if `loom/src` has uncommitted changes: only committed loom ships;
+1. it stops if `loom/` is not at the commit this repository records, or if `loom/src` has
+   uncommitted changes: only committed loom ships, and the package can be rebuilt from this
+   repository;
 2. `scripts/bundle.py` makes a fresh bundle;
 3. `npm run compile:production` makes the shipping build;
 4. `vsce package` makes the file, holding only what `vscode/.vscodeignore` names;

@@ -47,6 +47,19 @@ if (missing.length > 0) {
   process.exit(1)
 }
 
+// The package must be rebuildable from this repository: its loom is the commit recorded here.
+const submodule = execFileSync("git", ["submodule", "status", "loom"], {
+  cwd: ROOT,
+  encoding: "utf8",
+})
+if (submodule.startsWith("+")) {
+  console.error(
+    "loom/ is not at the commit this repository records. Commit the new pointer " +
+      "(git add loom, then git commit), or go back to the recorded commit (git submodule update)",
+  )
+  process.exit(1)
+}
+
 // Only committed loom ships: BUNDLE.txt names a commit, and that must say what is in the package.
 const changed = execFileSync("git", [
   "-C",

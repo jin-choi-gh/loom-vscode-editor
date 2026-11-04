@@ -45,6 +45,10 @@ if ($null -eq $python) {
 }
 
 Write-Host "== loom"
+# Updating would quietly move loom back to the recorded commit, and package that instead.
+if ((git submodule status loom) -like "+*") {
+    Fail "loom/ is not at the commit this repository records. Commit the new pointer (git add loom, then git commit), or go back to the recorded commit (git submodule update)"
+}
 Run git submodule update --init
 
 Write-Host "== the Python environment"
