@@ -3,7 +3,7 @@
   "displayName": "Loom Editor",
   "description": "Write loom's source files, and see the poem drawn beside them",
   "publisher": "jin-choi",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "SEE LICENSE IN LICENSE.md",
   "private": true,
   "categories": [

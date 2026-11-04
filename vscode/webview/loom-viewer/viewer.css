@@ -65,7 +65,6 @@ html {
 
 .line {
   position: relative;
-  margin-inline-start: calc(var(--indent) * 1em);
 }
 
 /* Hanging indent: a line too long to fit turns over, indented 2em */
@@ -73,6 +72,7 @@ html {
   display: block;
   padding-inline-start: 2em;
   text-indent: -2em;
+  margin-inline-start: calc(var(--indent) * 1em);
 }
 
 /* Numbers sit outside the block, so they don't affect its centring */

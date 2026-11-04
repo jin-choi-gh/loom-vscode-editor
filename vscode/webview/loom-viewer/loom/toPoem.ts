@@ -17,6 +17,7 @@ export function toPoem(textualComplex: LoomTextualComplex): Poem {
         text: textOf(textualComplex, line),
         indexInSubstrate: line.start[0],
         number: line.start[0] + 1,
+        indent: Number(line.value ?? 0) || 0,
       })),
     })),
   )

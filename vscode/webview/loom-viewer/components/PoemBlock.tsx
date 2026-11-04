@@ -1,4 +1,4 @@
-// import type { CSSProperties } from "react"
+import type { CSSProperties } from "react"
 import { Fragment, useEffect, useRef } from "react"
 import { cut } from "./cut"
 import type { Line, NoteRange, Poem } from "../types"
@@ -43,7 +43,7 @@ export function PoemBlock({
               key={line.id}
               className="line"
               data-line-id={line.id}
-              // style={{ '--indent': line.indent ?? 0 } as CSSProperties }
+              style={{ "--indent": line.indent } as CSSProperties}
             >
               {/* {line.number % 5 === 0 && ( */}
               <span className="line-number" aria-hidden="true">

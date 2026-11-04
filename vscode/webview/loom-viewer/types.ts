@@ -5,6 +5,7 @@ export interface Line {
   text: string // cut from the substrate by the unit's span
   indexInSubstrate: number // the line's place in the substrate, from 0, as loom's positions count
   number: number // the line's number, from 1, as printed beside it
+  indent: number // the indent depth, from 0
 }
 
 export interface Stanza {

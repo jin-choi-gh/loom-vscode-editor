@@ -16,11 +16,11 @@ milestones in the README say what comes next; this file holds what was set aside
       follow the theme for background, text and borders (VS Code's `--vscode-…` variables), keep
       anthos-reader's typography. _Where:_ a stylesheet of the editor's own, loaded after
       `viewer.css`, so loom-viewer's copy stays as in anthos-reader.
-- [ ] **Indents.** loom gives each line its indent (the `display` schema's line value), and
-      `viewer.css` already indents by `--indent`, but `PoemBlock` never sets it (the line is
-      commented out) and `Line` has no `indent` field. Fix in anthos-reader and in loom-viewer's
-      copy alike: `toPoem` reads the value, `PoemBlock` sets `--indent`. An example poem with
-      indents (Herbert's "Easter Wings") would show it.
+- [x] **Indents.** Each line's indent comes from the `display` schema's line value, through
+      `toPoem` and `--indent`, onto `.line-text`, so that the line labels stay in one column. Done
+      in loom-viewer; anthos-reader gets it by adopting the library.
+- [ ] **An example with indents.** `examples/` has no poem with indents, so nothing there shows
+      them. Herbert's "Easter Wings" would: its indents are its shape.
 - [ ] **A narrow panel.** The side-by-side layout needs about 40rem (the margin alone is at least
       16rem); in a narrow panel the poem's column gets thin. If it matters: put the notes below the
       poem when the panel is narrow, with a CSS container or media query, without anthos-reader's
