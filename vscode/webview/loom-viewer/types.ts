@@ -29,6 +29,7 @@ export interface Note {
   id: string
   lemma: LemmaPart[]
   paragraphs: string[]
+  tags: string[]
 }
 
 /** A stretch of one line that one note covers: a loom span clipped to that line, by offsets in code

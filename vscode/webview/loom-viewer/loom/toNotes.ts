@@ -20,6 +20,7 @@ export function toNotes(textualComplex: LoomTextualComplex): NoteIndex {
     id,
     lemma: lemmaOf(textualComplex, annotation.targets),
     paragraphs: paragraphsOf(annotation.body),
+    tags: annotation.tags ?? [],
   }))
 
   const ranges = rangesByLine(textualComplex, numbered)
