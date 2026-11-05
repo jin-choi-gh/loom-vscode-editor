@@ -1,2 +1,9 @@
 title = "The Sick Rose"
 author = "William Blake"
+
+[notes]
+tags = [
+    "type-1",
+    "type-2",
+    "type-3",
+]

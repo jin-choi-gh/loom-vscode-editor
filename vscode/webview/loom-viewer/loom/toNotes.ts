@@ -27,6 +27,7 @@ export function toNotes(textualComplex: LoomTextualComplex): NoteIndex {
 
   return {
     notes,
+    tags: textualComplex.metadata.notes?.tags ?? [],
     rangesOn: (indexInSubstrate) => ranges[indexInSubstrate] ?? [],
   }
 }

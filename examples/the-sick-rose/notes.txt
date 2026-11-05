@@ -1,14 +1,14 @@
-l1 ~ l8 ]
+l1 ~ l8 ] {type-1}
   Eight short lines in two stanzas, spoken to the rose throughout: the poem never turns away from
   the one it addresses.
 
-l1 O Rose thou art sick ]
+l1 O Rose thou art sick ] {type-2}
   The poem opens with a diagnosis, given to the patient.
 
-l2 invisible worm ]
+l2 invisible worm ] {type-1 type-2}
   The cause is named but cannot be seen: the worm is known only by what it does.
 
-l6 crimson joy ]
+l6 crimson joy ] {type-2 type-1}
   The bed the worm finds is the rose's own colour and its own pleasure.
 
 l7 dark secret love && l8 destroy ]

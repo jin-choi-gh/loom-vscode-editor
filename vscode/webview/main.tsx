@@ -4,10 +4,12 @@ import {
   Margin,
   NotesBlock,
   PoemBlock,
+  TagPills,
   TitleBlock,
   parseTextualComplex,
   toNotes,
   toPoem,
+  visibleNotes,
   type NoteIndex,
   type Poem,
 } from "./loom-viewer"
@@ -37,13 +39,17 @@ function viewOf(message: Message): View {
 function Page() {
   const [view, setView] = useState<View | null>(null)
   const [selectedNote, setSelectedNote] = useState<string | null>(null)
+  const [activeTags, setActiveTags] = useState<string[]>([])
   const folder = useRef<string | null>(null)
 
   useEffect(() => {
     const receive = (event: MessageEvent<Message>) => {
       const message = event.data
-      // Note ids belong to one folder's notes: notes:3 of another poem is another note
-      if (message.folder !== folder.current) setSelectedNote(null)
+      // Note ids and tags belong to one folder: notes:3 of another poem is another note
+      if (message.folder !== folder.current) {
+        setSelectedNote(null)
+        setActiveTags([])
+      }
       folder.current = message.folder
       setView(viewOf(message))
     }
@@ -59,6 +65,20 @@ function Page() {
   if (view === null) return <p>Save a loom file to see it here.</p>
   if ("error" in view) return <p className="error">{view.error}</p>
 
+  const { noteIndex } = view
+  // A save may have removed a tag from meta.toml while it was on
+  const shownTags = activeTags.filter((tag) => noteIndex.tags.includes(tag))
+  const notes = visibleNotes(noteIndex.notes, shownTags)
+  // A note out of the margin is not selected, so nothing of it is marked in the poem
+  const shownNote = notes.some((note) => note.id === selectedNote) ? selectedNote : null
+
+  // A note hidden by the pills stays deselected if they bring it back
+  const chooseTags = (tags: string[]) => {
+    setActiveTags(tags)
+    const stays = visibleNotes(noteIndex.notes, tags).some((note) => note.id === selectedNote)
+    if (!stays) setSelectedNote(null)
+  }
+
   return (
     <div className="reader" data-layout="spread">
       <article className="reader-text">
@@ -66,16 +86,18 @@ function Page() {
           <TitleBlock poem={view.poem} />
           <PoemBlock
             poem={view.poem}
-            rangesOn={view.noteIndex.rangesOn}
-            selectedNote={selectedNote}
+            rangesOn={noteIndex.rangesOn}
+            selectedNote={shownNote}
           />
         </div>
       </article>
       <Margin>
+        <TagPills tags={noteIndex.tags} activeTags={shownTags} onChange={chooseTags} />
         <NotesBlock
-          notes={view.noteIndex.notes}
-          selectedNote={selectedNote}
+          notes={notes}
+          selectedNote={shownNote}
           onToggle={toggleNote}
+          emptyMessage={shownTags.length > 0 ? "No notes with these tags." : undefined}
         />
       </Margin>
     </div>

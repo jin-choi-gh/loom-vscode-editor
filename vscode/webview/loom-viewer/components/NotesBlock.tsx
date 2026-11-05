@@ -8,13 +8,15 @@ export function NotesBlock({
   notes,
   selectedNote,
   onToggle,
+  emptyMessage = "No notes on this text.",
 }: {
   notes: Note[]
   selectedNote: string | null
   onToggle: (id: string) => void
+  emptyMessage?: string
 }) {
   if (notes.length === 0) {
-    return <p className="margin-empty">No notes on this text.</p>
+    return <p className="margin-empty">{emptyMessage}</p>
   }
   return (
     <div className="notes">

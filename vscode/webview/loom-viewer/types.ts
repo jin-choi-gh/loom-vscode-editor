@@ -42,5 +42,6 @@ export interface NoteRange {
 
 export interface NoteIndex {
   notes: Note[] // every note, in file order
+  tags: string[] // the tags declared in meta.toml, in its order
   rangesOn(indexInSubstrate: number): NoteRange[] // the ranges on one line
 }
