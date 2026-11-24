@@ -73,6 +73,7 @@ html {
   padding-inline-start: 2em;
   text-indent: -2em;
   margin-inline-start: calc(var(--indent) * 1em);
+  white-space: pre-wrap; /* consecutive spaces are kept as they are in the poem */
 }
 
 /* Numbers sit outside the block, so they don't affect its centring */
