@@ -1,5 +1,5 @@
 :root {
-  --highlight: #c4f6fb; /* the selected note, and its passages in the poem */
+  --highlight: #c4f6fb; /* the selected note, and its words in the text */
 }
 
 /* A: page */
@@ -29,7 +29,7 @@ html {
   scroll-padding-top: 2rem;
 }
 
-/* Centre title and poem together by the longest line; keep both left-aligned */
+/* Centre title and text together by the longest line; keep both left-aligned */
 .text-block {
   width: max-content;
   max-width: 100%;
@@ -39,7 +39,7 @@ html {
   line-height: 1.6;
 }
 
-/* Title block: 2 poem lines of space before the poem */
+/* Title block: 2 lines of space before the text */
 .title-block {
   margin-bottom: 2lh;
 }
@@ -63,8 +63,31 @@ html {
   margin-top: 1.6em;
 }
 
-.line {
-  position: relative;
+/* Further apart than stanzas, or two poems in a row would look like one */
+.passage + .passage {
+  margin-top: 3.2em;
+}
+
+/* The passage's name, as notes write it, when the text has several */
+.passage-name {
+  margin: 0 0 0.4em;
+  font-family: system-ui, sans-serif;
+  font-size: 0.7em;
+  opacity: 0.6;
+}
+
+.paragraph + .paragraph {
+  margin-top: 0.8em;
+}
+
+.line,
+.paragraph {
+  position: relative; /* for the label beside it */
+}
+
+/* A paragraph turns over at a comfortable length: without this, its longest line would be all of it */
+.paragraph {
+  max-width: 34em;
 }
 
 /* Hanging indent: a line too long to fit turns over, indented 2em */
@@ -73,7 +96,7 @@ html {
   padding-inline-start: 2em;
   text-indent: -2em;
   margin-inline-start: calc(var(--indent) * 1em);
-  white-space: pre-wrap; /* consecutive spaces are kept as they are in the poem */
+  white-space: pre-wrap; /* consecutive spaces are kept as they are in the source */
 }
 
 /* Numbers sit outside the block, so they don't affect its centring */
@@ -88,7 +111,7 @@ html {
   user-select: none;
 }
 
-/* Spread: the margin stays in view, level with the title, and scrolls on its own, never the poem.
+/* Spread: the margin stays in view, level with the title, and scrolls on its own, never the text.
    7rem is the reader's padding above (3rem) and below (4rem), so the margin always fits the window. */
 .margin {
   grid-area: margin;
@@ -194,7 +217,7 @@ html {
   outline: none;
 }
 
-/* Quotes from the poem in italics, without quotation marks; citations ("lines 1–4") upright */
+/* Quotes from the text in italics, without quotation marks; citations ("l1–l4") upright */
 .note-lemma q {
   quotes: none;
   font-style: italic;
@@ -204,8 +227,9 @@ html {
   margin: 0.5em 0 0;
 }
 
-/* The selected note's words in the poem: the same colour as its box, so the two read together */
-.line-text mark {
+/* The selected note's words in the text: the same colour as its box, so the two read together */
+.line-text mark,
+.paragraph-text mark {
   background: var(--highlight);
   color: inherit;
 }

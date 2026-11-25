@@ -35,6 +35,13 @@ milestones in the README say what comes next; this file holds what was set aside
       dependency. Until then the two copies must be kept in step by hand (see
       `vscode/webview/loom-viewer/README.md`).
 
+- [ ] **Saving a TEI file.** The extension is not told about `tei-display.xml`, so saving one does
+      not redraw the viewer. _Where:_ `documentSelector` in `src/extension.ts`, and the patterns in
+      `package.json`.
+- [ ] **Sending less.** The server sends loom's whole JSON, of which the viewer reads the passages,
+      the display schema, the notes and the metadata: under 2% of it for prose. Leave the rest out
+      when long texts make saving slow. _Where:_ `compose` in `server.py`.
+
 ## The build
 
 - [ ] **One Prettier version.** anthos-reader pins Prettier 3.9.10 and has `format` scripts; this

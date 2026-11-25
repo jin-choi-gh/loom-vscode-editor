@@ -1,12 +1,31 @@
 # Loom Editor
 
-Write loom's source files in VS Code, and see the poem drawn beside them.
+Write loom's source files in VS Code, and see the text drawn beside them.
 
-Open a folder holding loom's files (`display.txt`, `metre.txt`, `notes.txt`, `meta.toml`), open one
+Open a folder holding loom's files (`display.txt`, `display.verse.txt`, `display.prose.txt`, `metre.txt`,
+`notes.txt`, `meta.toml`), open one
 of them, and click the preview icon at the top right of the editor (or run **Loom: Open Viewer**
-from the Command Palette). A panel beside the file shows the title, the poem with its line ids, and
-the notes in a margin. Click a note to mark its words in the poem. Each time you save, the panel is
+from the Command Palette). A panel beside the file shows the title, the text with its line and paragraph ids, and
+the notes in a margin. Click a note to mark its words in the text. Each time you save, the panel is
 redrawn; if loom cannot compose the folder, the panel shows loom's message.
+
+## Verse and prose
+
+`display.verse.txt` holds one passage of verse: each row is a line, and blank rows divide stanzas.
+`display.prose.txt` holds one of prose: blank rows divide paragraphs, and a single new line means
+nothing. `display.txt` holds several passages, each under a heading with a name of its own:
+
+    [ prose: before ]
+
+    Blake's poem is often read as the ruin of a rose by a worm.
+
+    [ verse: rose ]
+
+    O Rose thou art sick.
+    The invisible worm,
+
+In `notes.txt`, a note on one passage of several says which: `rose.l2 worm ]`, `rose ]`. When the
+text has only one, `l2 worm ]` will do.
 
 ## What you need
 

@@ -1,0 +1,17 @@
+rose ]
+  All of Blake's poem.
+
+before.p1 less kind to the rose ]
+  The claim the rest of the commentary argues for.
+
+rose.l6 Of crimson joy && after.p1 of crimson joy ]
+  Blake's words, and the commentary's quotation of them.
+
+rose.l5 ~ rose.l6 ]
+  The two lines on which the reading turns.
+
+rose.l7 secret && after.p2 a secret older than the worm's own ]
+  The poem gives the secret to the worm; the commentary gives an earlier one to the rose.
+
+rose.l8 ~ after.p1 ]
+  From the last line of the poem into the prose that follows it.

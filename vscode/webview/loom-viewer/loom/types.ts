@@ -1,16 +1,21 @@
-// The JSON loom writes for one textual complex: loom/src/exports/textual_complex_json.py, format_version 1.
+// The JSON loom writes for one textual complex: loom/src/exports/textual_complex_json.py, format_version 2.
 
-/** [index of the line in `lines`, character offset within that line] */
-export type LoomPosition = [line: number, offset: number]
+/** [index of the block, counted through every passage's, character offset within that block] */
+export type LoomPosition = [block: number, offset: number]
 
 export interface LoomSpan {
   start: LoomPosition
   end: LoomPosition
 }
 
-export interface LoomLine {
+export interface LoomBlock {
   id: string
   text: string
+}
+
+export interface LoomPassage {
+  id: string
+  blocks: LoomBlock[]
 }
 
 export interface LoomUnit extends LoomSpan {
@@ -44,10 +49,10 @@ export interface LoomMetadata {
 
 export interface LoomTextualComplex {
   format: "loom-textual-complex"
-  format_version: 1
+  format_version: 2
   name: string | null
   metadata: LoomMetadata
-  lines: LoomLine[]
+  passages: LoomPassage[]
   schemata: Record<string, LoomSchema>
   atoms: LoomAtom[]
   annotations: Record<string, LoomAnnotation[]>

@@ -1,0 +1,26 @@
+[ prose: before ]
+
+Blake's poem is often read as the ruin of a rose by a worm. Harold Bloom's
+reading is less kind to the rose. This commentary follows it, in words that
+are not his.
+
+[ verse: rose ]
+
+O Rose thou art sick.
+The invisible worm,
+That flies in the night
+In the howling storm:
+
+Has found out thy bed
+Of crimson joy:
+And his dark secret love
+Does thy life destroy.
+
+[ prose: after ]
+
+The bed is already "of crimson joy" when the worm finds it out. The joy is
+not the worm's doing: the rose had it before, alone, in a bower shut to
+everyone else.
+
+So the rose is less innocent than it seems. What the worm finds out is a
+pleasure that was being kept, a secret older than the worm's own.

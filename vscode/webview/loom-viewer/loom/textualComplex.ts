@@ -1,20 +1,41 @@
-import type { LoomSchema, LoomSpan, LoomUnit, LoomTextualComplex } from "./types"
+import type { LoomBlock, LoomSchema, LoomSpan, LoomUnit, LoomTextualComplex } from "./types"
 
 // What loom's models do (loom/src/models), done on the JSON: the substrate's text, and the trees of
 // the schemata. Nothing here knows any particular kind of schema.
 
-/** The text a span covers, as loom's Substrate.text_of gives it: across lines, each line's part,
+// Each textual complex's blocks, worked out once: they are asked for block by block
+const flatBlocks = new WeakMap<LoomTextualComplex, LoomBlock[]>()
+
+/** Every passage's blocks, in order, as loom's Substrate.blocks gives them: what positions count. */
+export function blocksOf(textualComplex: LoomTextualComplex): LoomBlock[] {
+  const known = flatBlocks.get(textualComplex)
+  if (known !== undefined) return known
+  const blocks = textualComplex.passages.flatMap((passage) => passage.blocks)
+  flatBlocks.set(textualComplex, blocks)
+  return blocks
+}
+
+/** A block's id without its passage's, as it is shown beside the block: l1 for bird.l1. An id that
+ * does not begin with its passage's is left as it is. */
+export function shortId(passageId: string, blockId: string): string {
+  const name = `${passageId}.`
+  return blockId.startsWith(name) ? blockId.slice(name.length) : blockId
+}
+
+/** The text a span covers, as loom's Substrate.text_of gives it: across blocks, each block's part,
  * joined by line breaks. Offsets count code points, as Python's do, not UTF-16 units. */
 export function textOf(textualComplex: LoomTextualComplex, span: LoomSpan): string {
-  const [startLine, startOffset] = span.start
-  const [endLine, endOffset] = span.end
-  const line = (index: number) => codePoints(lineAt(textualComplex, index).text)
-  if (startLine === endLine) {
-    return line(startLine).slice(startOffset, endOffset).join("")
+  const [startBlock, startOffset] = span.start
+  const [endBlock, endOffset] = span.end
+  const block = (index: number) => codePoints(blockAt(textualComplex, index).text)
+  if (startBlock === endBlock) {
+    return block(startBlock).slice(startOffset, endOffset).join("")
   }
-  const first = line(startLine).slice(startOffset).join("")
-  const middle = textualComplex.lines.slice(startLine + 1, endLine).map((l) => l.text)
-  const last = line(endLine).slice(0, endOffset).join("")
+  const first = block(startBlock).slice(startOffset).join("")
+  const middle = blocksOf(textualComplex)
+    .slice(startBlock + 1, endBlock)
+    .map(({ text }) => text)
+  const last = block(endBlock).slice(0, endOffset).join("")
   return [first, ...middle, last].join("\n")
 }
 
@@ -56,17 +77,17 @@ export class SchemaTree {
   }
 }
 
-function lineAt(textualComplex: LoomTextualComplex, index: number) {
-  const line = textualComplex.lines[index]
-  if (line === undefined) {
-    throw new Error(`${textualComplex.name}: no line at index ${index}`)
+function blockAt(textualComplex: LoomTextualComplex, index: number): LoomBlock {
+  const block = blocksOf(textualComplex)[index]
+  if (block === undefined) {
+    throw new Error(`${textualComplex.name}: no block at index ${index}`)
   }
-  return line
+  return block
 }
 
-/** A line's length as loom counts it, in code points. */
-export function lineLength(textualComplex: LoomTextualComplex, index: number): number {
-  return codePoints(lineAt(textualComplex, index).text).length
+/** A block's length as loom counts it, in code points. */
+export function blockLength(textualComplex: LoomTextualComplex, index: number): number {
+  return codePoints(blockAt(textualComplex, index).text).length
 }
 
 /** A text's characters as loom counts them: code points, not UTF-16 units, so that loom's offsets

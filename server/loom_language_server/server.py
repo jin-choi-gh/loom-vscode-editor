@@ -55,7 +55,8 @@ def compose_and_send(ls: LanguageServer, uri: str) -> None:
 
     composed, error = compose(synthesis, folder)
     if composed is not None:
-        log(ls, f"composed {folder.name}: {len(composed['lines'])} lines")
+        blocks = sum(len(passage["blocks"]) for passage in composed["passages"])
+        log(ls, f"composed {folder.name}: {blocks} blocks")
         ls.protocol.notify(
             "loom/composed", {"folder": str(folder), "textualComplex": composed}
         )

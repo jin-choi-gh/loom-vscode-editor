@@ -62,8 +62,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // (booth.notes.txt), and meta.toml.
   const clientOptions: LanguageClientOptions = {
     documentSelector: [
-      { scheme: "file", pattern: "**/{display,metre,notes}.txt" },
-      { scheme: "file", pattern: "**/*.{display,metre,notes}.txt" },
+      { scheme: "file", pattern: "**/{display,display.verse,display.prose,metre,notes}.txt" },
+      { scheme: "file", pattern: "**/*.{display,display.verse,display.prose,metre,notes}.txt" },
       { scheme: "file", pattern: "**/meta.toml" },
     ],
     // What the server is told when it starts: where loom is.

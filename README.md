@@ -10,7 +10,8 @@ holds loom's source, so keep it out of git and anywhere public (see "Packaging")
 
 ---
 
-A VS Code extension for writing [loom](../loom)'s source files (`display.txt`, `metre.txt`,
+A VS Code extension for writing [loom](../loom)'s source files (`display.txt`, `display.verse.txt`,
+`display.prose.txt`, `metre.txt`,
 `notes.txt`, `meta.toml`). It is meant to:
 
 - show loom's errors in the files, where you type;
@@ -51,7 +52,7 @@ For someone given the extension as a file (`loom-editor-<version>.vsix`):
    - Linux: with the package manager, for example `sudo apt install python3.12`.
 2. **Install the extension**: in VS Code, open Extensions, then "…" at the top of the panel ›
    Install from VSIX…, and choose the file.
-3. **Open a folder** that holds loom's files, open a `display.txt`, and click the preview icon at
+3. **Open a folder** that holds loom's files, open one of them, and click the preview icon at
    the editor's top right: the poem appears beside it, and is redrawn each time the file is saved.
 
 The extension finds Python by itself (see "Settings"). What it found, and everything it tried, is in
@@ -124,8 +125,10 @@ or `node scripts/find_python.mjs <path>` to try a Python as if it were set in `l
       bundled/                 what ships for the server: our server, loom, its libraries and their
                                licences (made by scripts/bundle.py, not committed)
     examples/                  small loom texts to try the extension on
-      the-sick-rose/           Blake, "The Sick Rose" (display.txt, meta.toml), with a few notes
+      the-sick-rose/           Blake, "The Sick Rose" (display.verse.txt, meta.toml), with a few notes
                                of our own (notes.txt) to fill the viewer's margin
+      the-sick-rose-after-bloom/   the same poem in a prose commentary (display.txt), after
+                               Harold Bloom's reading but in our words, with notes across them
     .vscode/                   VS Code's settings for working on this repository
       launch.json              F5: run the extension in a second window, on examples/
       tasks.json               before each run: bundles the server, then compiles the extension
@@ -154,9 +157,7 @@ loom is included as a git submodule in `loom/`: this repository records only whi
 (or clone with `git clone --recurse-submodules …` to do both at once). To move to a newer loom,
 update the submodule and commit the new pointer:
 
-    cd loom
-    git pull
-    cd ..
+    git submodule update --remote loom
     git add loom
     git commit -m "Use loom at <commit>"
 
@@ -288,10 +289,10 @@ place. loom is not run with `-I`, because it finds its own modules beside `synth
 
    (To run with a particular Python, set `loom.python` in your user settings.)
 
-4. Open `the-sick-rose/display.txt`, then open the viewer: the preview icon at the editor's top
+4. Open `the-sick-rose/display.verse.txt`, then open the viewer: the preview icon at the editor's top
    right, or Ctrl+Shift+P › **Loom: Open Viewer**. A panel beside the file shows the title and the
    poem (every line labelled with its id), with the notes in a margin on the right; the log adds
-   `composed the-sick-rose: 8 lines`.
+   `composed the-sick-rose: 8 blocks`.
 5. Click a note: its words are marked in the poem, in the colour of the note's box. Click it again
    to clear the mark.
 6. Change the file and save it (Ctrl+S): the panel shows the change, and a selected note stays
@@ -305,7 +306,7 @@ If it does not work:
 
 | what you see                                          | likely cause                                                                                    |
 | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| no "Loom" in the Output dropdown                      | the extension did not start: the open folder must contain a `display.txt`                       |
+| no "Loom" in the Output dropdown                      | the extension did not start: the open folder must contain a display file                        |
 | "Loom needs Python 3.12 or newer, and found none"     | install one (see "Installing"), or name it in `loom.python`; Output › Loom lists what was tried |
 | "the Python in loom.python is not usable"             | the setting names no Python, or one older than 3.12: correct or clear it                        |
 | "Loom" is there but empty                             | the server did not start: try `scripts/talk.py`                                                 |

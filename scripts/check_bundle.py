@@ -22,8 +22,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 BUNDLED = ROOT / "vscode" / "bundled"
-EXAMPLE = ROOT / "examples" / "the-sick-rose" / "display.txt"
-EXPECTED_LINES = 8
+EXAMPLE = ROOT / "examples" / "the-sick-rose" / "display.verse.txt"
+EXPECTED_BLOCKS = 8
 
 # Names that the server (json) and loom (models) import: a copy in the open folder must never
 # be imported in their place.
@@ -105,9 +105,10 @@ def check_server(bundled: Path) -> None:
     elif composed.get("method") != "loom/composed":
         problems.append(f"expected loom/composed, got {composed.get('method')}")
     else:
-        lines = len(composed["params"]["textualComplex"]["lines"])
-        if lines != EXPECTED_LINES:
-            problems.append(f"expected {EXPECTED_LINES} lines, got {lines}")
+        passages = composed["params"]["textualComplex"]["passages"]
+        blocks = sum(len(passage["blocks"]) for passage in passages)
+        if blocks != EXPECTED_BLOCKS:
+            problems.append(f"expected {EXPECTED_BLOCKS} blocks, got {blocks}")
     if errors:
         problems.append(f"the server wrote errors:\n{errors}")
     if problems:

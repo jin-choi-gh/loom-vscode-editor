@@ -3,15 +3,17 @@ import { createRoot } from "react-dom/client"
 import {
   Margin,
   NotesBlock,
-  PoemBlock,
+  Passages,
   TagPills,
   TitleBlock,
   parseTextualComplex,
+  toMetadata,
   toNotes,
-  toPoem,
+  toPassages,
   visibleNotes,
+  type Metadata,
   type NoteIndex,
-  type Poem,
+  type Passage,
 } from "./loom-viewer"
 import "./loom-viewer/viewer.css"
 
@@ -20,17 +22,21 @@ type Message =
   | { kind: "composed"; folder: string; textualComplex: unknown }
   | { kind: "failed"; folder: string; error: string }
 
-/** What the page shows of one composition: its poem and its notes, or why there are none. */
-type View = { poem: Poem; noteIndex: NoteIndex } | { error: string }
+/** What the page shows of one composition: its title, passages and notes, or why there are none. */
+type View = { metadata: Metadata; passages: Passage[]; noteIndex: NoteIndex } | { error: string }
 
 const vscode = acquireVsCodeApi()
 
-/** A message as the page shows it: loom's JSON checked and made into a poem and its notes. */
+/** A message as the page shows it: loom's JSON checked and made into what it draws. */
 function viewOf(message: Message): View {
   if (message.kind === "failed") return { error: message.error }
   try {
     const textualComplex = parseTextualComplex(message.textualComplex, message.folder)
-    return { poem: toPoem(textualComplex), noteIndex: toNotes(textualComplex) }
+    return {
+      metadata: toMetadata(textualComplex),
+      passages: toPassages(textualComplex),
+      noteIndex: toNotes(textualComplex),
+    }
   } catch (e) {
     return { error: e instanceof Error ? e.message : String(e) }
   }
@@ -45,7 +51,7 @@ function Page() {
   useEffect(() => {
     const receive = (event: MessageEvent<Message>) => {
       const message = event.data
-      // Note ids and tags belong to one folder: notes:3 of another poem is another note
+      // Note ids and tags belong to one folder: notes:3 of another text is another note
       if (message.folder !== folder.current) {
         setSelectedNote(null)
         setActiveTags([])
@@ -69,7 +75,7 @@ function Page() {
   // A save may have removed a tag from meta.toml while it was on
   const shownTags = activeTags.filter((tag) => noteIndex.tags.includes(tag))
   const notes = visibleNotes(noteIndex.notes, shownTags)
-  // A note out of the margin is not selected, so nothing of it is marked in the poem
+  // A note out of the margin is not selected, so nothing of it is marked in the text
   const shownNote = notes.some((note) => note.id === selectedNote) ? selectedNote : null
 
   // A note hidden by the pills stays deselected if they bring it back
@@ -83,9 +89,9 @@ function Page() {
     <div className="reader" data-layout="spread">
       <article className="reader-text">
         <div className="text-block">
-          <TitleBlock poem={view.poem} />
-          <PoemBlock
-            poem={view.poem}
+          <TitleBlock metadata={view.metadata} />
+          <Passages
+            passages={view.passages}
             rangesOn={noteIndex.rangesOn}
             selectedNote={shownNote}
           />

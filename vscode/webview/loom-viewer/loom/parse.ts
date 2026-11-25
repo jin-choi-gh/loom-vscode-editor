@@ -5,9 +5,9 @@ export function parseTextualComplex(data: unknown, origin: string): LoomTextualC
   if (!isObject(data) || data.format !== "loom-textual-complex") {
     throw new Error(`${origin}: not a loom textual complex`)
   }
-  if (data.format_version !== 1) {
+  if (data.format_version !== 2) {
     throw new Error(
-      `${origin}: format version ${String(data.format_version)}, but this reader reads version 1`,
+      `${origin}: format version ${String(data.format_version)}, but this reader reads version 2`,
     )
   }
   return data as unknown as LoomTextualComplex

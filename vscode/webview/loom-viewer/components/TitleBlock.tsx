@@ -1,12 +1,12 @@
-import type { Poem } from "../types"
+import type { Metadata } from "../types"
 
-export function TitleBlock({ poem }: { poem: Poem }) {
+export function TitleBlock({ metadata }: { metadata: Metadata }) {
   return (
     <header className="title-block">
-      <h1 className="title">{poem.title}</h1>
+      <h1 className="title">{metadata.title}</h1>
       <p className="poet">
-        {poem.author}
-        {poem.year !== undefined && ` · ${poem.year}`}
+        {metadata.author}
+        {metadata.year !== undefined && ` · ${metadata.year}`}
       </p>
     </header>
   )

@@ -1,7 +1,7 @@
 {
   "name": "loom-editor",
   "displayName": "Loom Editor",
-  "description": "Write loom's source files, and see the poem drawn beside them",
+  "description": "Write loom's source files, and see the text drawn beside them",
   "publisher": "jin-choi",
   "version": "0.1.5",
   "license": "SEE LICENSE IN LICENSE.md",
@@ -20,7 +20,9 @@
     "virtualWorkspaces": false
   },
   "activationEvents": [
-    "workspaceContains:**/*display.txt"
+    "workspaceContains:**/*display.txt",
+    "workspaceContains:**/*display.verse.txt",
+    "workspaceContains:**/*display.prose.txt"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -36,7 +38,7 @@
       "editor/title": [
         {
           "command": "loom.openViewer",
-          "when": "resourceFilename =~ /(^|\\.)(display|metre|notes)\\.txt$|^meta\\.toml$/",
+          "when": "resourceFilename =~ /(^|\\.)(display|display\\.verse|display\\.prose|metre|notes)\\.txt$|^meta\\.toml$/",
           "group": "navigation"
         }
       ]
